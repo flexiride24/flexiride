@@ -1,0 +1,114 @@
+<?php
+// PHP for handling the location and sending the email when the user clicks the "Reached" button.
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Get data from the AJAX request
+    $data = json_decode(file_get_contents("php://input"), true);
+    $latitude = $data['latitude'];
+    $longitude = $data['longitude'];
+
+    // Email setup
+    $to = 'rangareddyvenkata734@gmail.com';
+    $subject = 'User Reached Destination';
+    $message = 'A user has reached their destination. Location: Latitude: ' . $latitude . ', Longitude: ' . $longitude;
+    $headers = 'From: no-reply@yourwebsite.com' . "\r\n" .
+               'Reply-To: no-reply@yourwebsite.com' . "\r\n" .
+               'X-Mailer: PHP/' . phpversion();
+
+    // Send email
+    if (mail($to, $subject, $message, $headers)) {
+        echo json_encode(["status" => "success", "message" => "Email sent successfully."]);
+    } else {
+        echo json_encode(["status" => "error", "message" => "Failed to send email."]);
+    }
+
+    exit;
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Location Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        #reached-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        #reached-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Reached Your Destination?</h2>
+    <p>Click the button below to send your location and notify someone that you have reached your destination.</p>
+    <button id="reached-btn">Reached</button>
+</div>
+
+<script>
+// JavaScript for handling the "Reached" button click and getting the user's live location
+document.getElementById('reached-btn').addEventListener('click', function() {
+    // Check if geolocation is available
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(sendLocation);
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
+});
+
+function sendLocation(position) {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+
+    // Send the live location to the PHP backend via a fetch request
+    fetch(window.location.href, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            latitude: latitude,
+            longitude: longitude,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            alert('Location sent! Email notification has been sent.');
+        } else {
+            alert('Failed to send location or email.');
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+</script>
+
+</body>
+</html>

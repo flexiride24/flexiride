@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+header {
+  text-align: center;
+  padding: 50px 0;
+  background-color: #f4f4f4;
+}
+
+.animated-section {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  position: relative;
+  opacity: 0;
+  transform: translateY(100px);
+  transition: all 0.6s ease-out;
+}
+
+.animated-section .content {
+  text-align: center;
+}
+
+.animated-section i {
+  font-size: 100px;
+  color: #333;
+  margin-bottom: 20px;
+  transition: transform 0.5s ease-in-out;
+}
+
+.animated-section h2 {
+  font-size: 36px;
+}
+
+.animated-section.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.animated-section.active i {
+  transform: rotate(360deg);
+}
+
+#section1 {
+  background-color: #ffcccc;
+}
+
+#section2 {
+  background-color: black;
+}
+
+#section3 {
+  background-color: cyan;
+}
+
+    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scroll Animations</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Link Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Scroll Down to See Animations</h1>
+  </header>
+  
+  <section class="animated-section" id="section1">
+    <div class="content">
+      <i class="fas fa-car"></i>
+      <h2>Car Animation</h2>
+    </div>
+  </section>
+
+  <section class="animated-section" id="section2">
+    <div class="content">
+      <i class="fas fa-bicycle"></i>
+      <h2>Bike Animation</h2>
+    </div>
+  </section>
+
+  <section class="animated-section" id="section3">
+    <div class="content">
+      <i class="fas fa-plane"></i>
+      <h2>Plane Animation</h2>
+    </div>
+  </section>
+
+  <script src="script.js">
+    $(document).ready(function() {
+  // Check scroll position to activate animations
+  $(window).on('scroll', function() {
+    $('.animated-section').each(function() {
+      var sectionTop = $(this).offset().top;
+      var scrollPos = $(window).scrollTop();
+      var windowHeight = $(window).height();
+
+      // Check if the section is visible in the viewport
+      if (scrollPos > sectionTop - windowHeight / 1.5) {
+        $(this).addClass('active');
+      }
+    });
+  });
+});
+
+  </script>
+</body>
+</html>

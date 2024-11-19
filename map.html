@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculate Distance with OpenStreetMap</title>
+    <style>
+        #map { height: 500px; width: 100%; margin-top: 10px; }
+        .container {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        input {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 300px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Calculate Distance</h2>
+    <label for="start">Starting Point:</label><br>
+    <input type="text" id="start" placeholder="Enter start location"><br>
+    
+    <label for="end">Ending Point:</label><br>
+    <input type="text" id="end" placeholder="Enter end location"><br>
+    
+    <button id="calculate-distance">Get Distance</button>
+
+    <div id="distance"></div>
+    <div id="amount"></div>
+</div>
+
+<script>
+document.getElementById('calculate-distance').addEventListener('click', function() {
+    var startLocation = document.getElementById('start').value;
+    var endLocation = document.getElementById('end').value;
+
+    if (startLocation && endLocation) {
+        // Use Nominatim service to geocode locations (converting names to lat/lng)
+        var geocodeUrl = 'https://nominatim.openstreetmap.org/search?format=json&q=';
+
+        Promise.all([
+            fetch(geocodeUrl + encodeURIComponent(startLocation)).then(response => response.json()),
+            fetch(geocodeUrl + encodeURIComponent(endLocation)).then(response => response.json())
+        ])
+        .then(data => {
+            if (data[0].length > 0 && data[1].length > 0) {
+                var startCoords = [parseFloat(data[0][0].lat), parseFloat(data[0][0].lon)];
+                var endCoords = [parseFloat(data[1][0].lat), parseFloat(data[1][0].lon)];
+
+                var distanceKm = haversineDistance(startCoords, endCoords).toFixed(2);
+
+                document.getElementById('distance').innerHTML = 'Distance: ' + distanceKm + ' km';
+                document.getElementById('amount').innerHTML = 'Amount: '+ '$' + Math.round(distanceKm*2/10)*10 ;
+
+            } else {
+                alert("Couldn't find one or both of the locations.");
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching geolocation data:', error);
+            alert("An error occurred while fetching location data.");
+        });
+    } else {
+        alert('Please enter both starting and ending points.');
+    }
+});
+
+// Haversine formula to calculate the great-circle distance between two points
+function haversineDistance(coords1, coords2) {
+    const R = 6371; // Radius of the Earth in km
+    const lat1 = coords1[0];
+    const lon1 = coords1[1];
+    const lat2 = coords2[0];
+    const lon2 = coords2[1];
+
+    const dLat = toRadians(lat2 - lat1);
+    const dLon = toRadians(lon2 - lon1);
+
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // Distance in km
+}
+
+function toRadians(deg) {
+    return deg * (Math.PI / 180);
+}
+</script>
+
+</body>
+</html>

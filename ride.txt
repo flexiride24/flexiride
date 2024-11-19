@@ -1,0 +1,81 @@
+<?php
+// ride_input.php
+
+session_start();
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Store form data into session
+    $_SESSION['origin'] = $_POST['origin'];
+    $_SESSION['destination'] = $_POST['destination'];
+    $_SESSION['ride_date'] = $_POST['ride_date'];
+    $_SESSION['ride_time'] = $_POST['ride_time'];
+    $_SESSION['vehicle_type'] = $_POST['vehicle_type'];
+    
+    // Redirect to the second page
+    header("Location: ride_output.php");
+    exit();
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Input</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #f06, #ff6347);
+            margin: 0;
+        }
+        .form-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Enter Ride Details</h2>
+        <form method="post" action="">
+            <input type="text" name="origin" placeholder="Enter origin" required>
+            <input type="text" name="destination" placeholder="Enter destination" required>
+            <input type="date" name="ride_date" required>
+            <input type="time" name="ride_time" required>
+            <select name="vehicle_type" required>
+                <option value="car">Car</option>
+                <option value="bike">Bike</option>
+            </select>
+            <button type="submit">Next</button>
+        </form>
+    </div>
+</body>
+</html>

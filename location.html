@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Location Tracking</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<h1>Live Location Tracking</h1>
+<div id="locationDisplay">Waiting for location...</div>
+
+<script>
+    // Function to get live location and send it to the server
+    function getLiveLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(showPosition, showError, {
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: 5000
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    // Function to display and send the location to the server
+    function showPosition(position) {
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+
+        // Display the location
+        $('#locationDisplay').text('Latitude: ' + latitude + ', Longitude: ' + longitude);
+
+        // Send the location to the server using AJAX
+        updateLocationToAdmin(latitude, longitude);
+    }
+
+    // Error handling for geolocation
+    function showError(error) {
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                alert("User denied the request for Geolocation.");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                alert("Location information is unavailable.");
+                break;
+            case error.TIMEOUT:
+                alert("The request to get user location timed out.");
+                break;
+            case error.UNKNOWN_ERROR:
+                alert("An unknown error occurred.");
+                break;
+        }
+    }
+
+    // Function to send the location to the backend
+    function updateLocationToAdmin(latitude, longitude) {
+        $.ajax({
+            url: "update_location.php",  // Backend script to handle location data
+            type: "POST",
+            data: {
+                latitude: latitude,
+                longitude: longitude
+            },
+            success: function(response) {
+                console.log("Location sent to admin: " + response);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error in sending location: " + error);
+            }
+        });
+    }
+
+    // Call the function to start tracking the location
+    getLiveLocation();
+</script>
+
+</body>
+</html>
